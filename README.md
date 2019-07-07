@@ -68,6 +68,6 @@ We can use crontab for scheduling the job to download the twitter trends hourly 
 - Install Mysql ODBC connector
 - Enter the credentails to connect to data through get command in Power BI. 
 - Create the desired visulization.
-- Snaoshot of dashboard is saved in 'snapshot' directory.
+- Snapshot of dashboard is saved in 'snapshot' directory.
 
 
