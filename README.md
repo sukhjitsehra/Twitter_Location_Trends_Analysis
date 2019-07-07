@@ -12,11 +12,11 @@ Understand daily trending topics for Canada from twitter data
 - Connect to the data via Power BI.
 
 ## Technologies and Packages
-- Python 3
-- pymysql
-- requests
-- base64
-- json
+- Python 3 and Packages
+    - pymysql
+    - requests
+    - base64
+    - json
 - MySQL Server
 - MySQL OBDC connector
 - Power BI for visualizations
