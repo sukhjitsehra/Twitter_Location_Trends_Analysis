@@ -45,4 +45,29 @@ It returns the top 50 trending topics for a specific WOEID, if trending informat
 
 ![DB Design](./snapshot/DbDesign.png)
 
+# Setting up the cron jobs
+
+## For Windows
+
+We can use Task Scheduler to run the 'main.py store' on hourly basis. 
+
+## For Unix/Mac
+
+We can use crontab for scheduling the job to download the twitter trends hourly basis. Following steps must be taken for the same. 
+
+- In your terminal enter 'crontab -e'
+- it will open edit windows 
+- type 'i' to go into insert mode 
+- type ' * * * * * cd /directory/location/folder /location/of/python /location/of/file.py'
+- press escape button and enter :wq to save and exit
+- use crontab -l to see the running jobs
+- use crontab -r to kill the jobs 
+
+# For visualization 
+- Install Power Bi Desktop
+- Install Mysql ODBC connector
+- Enter the credentails to connect to data through get command in Power BI. 
+- Create the desired visulization.
+- Snaoshot of dashboard is saved in 'snapshot' directory.
+
 
