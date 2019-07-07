@@ -21,7 +21,7 @@ Understand daily trending topics for Canada from twitter data
 - MySQL OBDC connector
 - Power BI for visualizations
 
-## Getting Started
+## Introduction
 
 The scripts for scrapping the twitter trends based on location are written in python, these use the twitter authentication key and tokens to register the application. This enables the user to fetch the information from the twitter using API calls to (https://developer.twitter.com/en/docs/trends/locations-with-trending-topics/api-reference/get-trends-available). The data is downloaded into the MySQL database and using the cron jobs used to update the exising trends for Canada. Power BI connects to MySQL for creating the required visulaizations. 
 
