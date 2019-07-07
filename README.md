@@ -46,6 +46,3 @@ It returns the top 50 trending topics for a specific WOEID, if trending informat
 ![DB Design](./snapshot/DbDesign.png)
 
 
-# Power BI Dashboard
-
-![PowerBI](./snapshot/PowerBIDashboard.pdf)
