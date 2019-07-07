@@ -48,4 +48,4 @@ It returns the top 50 trending topics for a specific WOEID, if trending informat
 
 # Power BI Dashboard
 
-![PowerBI](./snapshot/PowerBI_Dashboard)
+![PowerBI](./snapshot/PowerBI_Dashboard.pdf)
