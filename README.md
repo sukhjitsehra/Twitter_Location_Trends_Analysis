@@ -58,7 +58,7 @@ We can use crontab for scheduling the job to download the twitter trends hourly 
 - In your terminal enter 'crontab -e'
 - it will open edit windows 
 - type 'i' to go into insert mode 
-- type ' * * * * * cd /directory/location/folder /location/of/python /location/of/file.py'
+- type ' 0 0 * * * cd /directory/location/folder /location/of/python /location/of/file.py' to run every hour to run at the beginning of the hour.
 - press escape button and enter :wq to save and exit
 - use crontab -l to see the running jobs
 - use crontab -r to kill the jobs 
