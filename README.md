@@ -32,6 +32,15 @@ The scripts for scrapping the twitter trends based on location are written in py
 - Install MySQL from https://dev.mysql.com/downloads/installer/
 - Install Power BI from https://powerbi.microsoft.com/en-us/desktop/
 
+# Attributes of Twitter Trends API data
+It returns the top 50 trending topics for a specific WOEID, if trending information is available for it.
+
+- name - it is name of the trend
+- URL - specified URL for trend
+- promoted content
+- query
+- tweet_volume value returns the volume for each trend. This is the volume of tweets per trend for the last 24 hours.
+
 # DB Design 
 
 ![DB Design](DbDesign.png)
