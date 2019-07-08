@@ -53,15 +53,9 @@ It returns the top 50 trending topics for a specific WOEID, if trending informat
 ### To extract data from twitter and store in db run:
  - python main.py store
 
-### To search data from db run:
+### To search data from db run any of following:
 - python main.py search hourly 30 (This will give hourly trends for last 30 hours)
-
-or
-
 - python main.py search daily 7 (This will give daily trends for last 7 days)
-
-or
-
 - python main.py search date 2019-07-07 (This will give hourly trends for a given day in YYYY-MM-DD format)
 
 # Setting up the cron jobs
