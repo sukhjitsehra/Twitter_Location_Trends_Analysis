@@ -2,15 +2,17 @@ import requests
 import base64
 import json
 import pymysql
+from datetime import datetime
 
 def load_settings():
-    global SETTINGS
-    
-    with open('settings.json','r') as file:
+    """Function to load all the configuration settings for use throghout."""
+    with open("settings.json", "r") as file:
         SETTINGS = json.loads(file.read())
     return SETTINGS
         
 def get_auth_token(SETTINGS):
+    """Function to get the authenticated access token for twitter API."""
+    print ("Getting Twitter authentication ...", end = "")
     key_secret = '{}:{}'.format(SETTINGS["client_key"], SETTINGS["client_secret"]).encode('ascii')
     b64_encoded_key = base64.b64encode(key_secret)
     b64_encoded_key = b64_encoded_key.decode('ascii')
@@ -25,10 +27,14 @@ def get_auth_token(SETTINGS):
     }
     auth_resp = requests.post(auth_url, headers=auth_headers, data=auth_data)
     if auth_resp.status_code != 200:
+        print ("FAILED!")
         return None
+    print ("DONE!")
     return auth_resp.json()['access_token']
     
-def get_trends(auth_token, SETTINGS):
+def get_trends(SETTINGS, auth_token):
+    """Function to fetch the location trend data from twitter API."""
+    print ("Fetching raw data from Twitter API...", end = "")
     headers = {
         'Authorization': 'Bearer {}'.format(auth_token)    
     }
@@ -40,12 +46,15 @@ def get_trends(auth_token, SETTINGS):
     resp = requests.get(url, headers = headers, params = params)
     
     if resp.status_code != 200:
+        print ("FAILED!")
         return None
-    
+    print ("DONE!")
     return resp.json()[0]
     
-def store_trends(digest):
+def store_trends(SETTINGS, digest):
+    """Function to store the fetched location trends in SQL database."""
     try:
+        print ("Storing data into DB...", end = "")
         db = pymysql.connect(
             SETTINGS["db_host"], 
             SETTINGS["db_user"],
@@ -76,15 +85,15 @@ def store_trends(digest):
             )
             cursor.execute(query)
         
-        #Insert Data in DailyDigest Table
+        #Insert Data in TwitterDigest Table
         query = """
-            INSERT INTO DailyDigest (
+            INSERT INTO TwitterDigest (
                 created_at,
                 as_of,
                 woeid
             ) VALUES (
-                '{}',
-                '{}',
+                (STR_TO_DATE('{}', '%Y-%c-%eT%TZ')),
+                (STR_TO_DATE('{}', '%Y-%c-%eT%TZ')),
                 {}
             )
         """.format(
@@ -93,10 +102,22 @@ def store_trends(digest):
             woeid
         )
         cursor.execute(query)
+        
+        #Store raw JSON
+        query = """
+            INSERT INTO DigestJson (
+                date_time,
+                digest
+            ) VALUES (
+                now(),
+                '{}'
+            )
+        """.format(json.dumps(digest).replace("'", "\\'").replace('"', '\\"'))
+        cursor.execute(query)
             
-        #Get the max DailyDigest ID:
-        cursor.execute("SELECT MAX(id) FROM DailyDigest")
-        max_daily_digest_id = int(cursor.fetchall()[0][0])
+        #Get the max TwitterDigest ID:
+        cursor.execute("SELECT MAX(id) FROM TwitterDigest")
+        max_twitter_digest_id = int(cursor.fetchall()[0][0])
         
         #Get the max Trend ID:
         cursor.execute("SELECT MAX(id) FROM Trends")
@@ -112,11 +133,19 @@ def store_trends(digest):
         for trend in trends:
             if trend_values != "":
                 trend_values += ","
-            trend_values += "('{}', '{}', '{}', '{}')".format(
-                trend["name"], 
-                trend["tweet_volume"], 
-                trend["promoted_content"],
-                trend["url"]
+            name = trend["name"].replace("'", "\\'").replace('"', '\\"')
+            if name[0] == "#": name = name[1:]
+            try:
+                tweet_volume = int(trend["tweet_volume"])
+            except Exception as e:
+                tweet_volume = "NULL"
+            promoted_content = trend["promoted_content"]
+            url = trend["url"]
+            trend_values += "('{}', {}, '{}', '{}')".format(
+                name,
+                tweet_volume,
+                promoted_content,
+                url
             )
         query = """
             INSERT INTO Trends (
@@ -127,24 +156,100 @@ def store_trends(digest):
             ) VALUES {}
         """.format(trend_values)
         
-        print(prev_trend_id)
         count = cursor.execute(query)
         new_trend_ids = [i for i in range(prev_trend_id + 1, prev_trend_id + count + 1)]
         id_combos = ""
         for id in new_trend_ids:
             if id_combos != "":
                 id_combos += ","
-            id_combos += "({}, {})".format(max_daily_digest_id, id)
+            id_combos += "({}, {})".format(max_twitter_digest_id, id)
         
-        #Insert into DailyTrends
+        #Insert into TimeTrendMapping
         query = """
-            INSERT INTO DailyTrends (
-                daily_digest_id,
+            INSERT INTO TimeTrendMapping (
+                digest_id,
                 trend_id
             ) VALUES {}
         """.format(id_combos)
         cursor.execute(query)
         db.commit()
+        print ("DONE!")
     except Exception as e:
-        db.commit()
+        print ("FAILED!")
+        raise(e)
+        
+def trend_in_interval(SETTINGS, start, end):
+    """Function to retrieve data from SQL DB for trends in the given time interval."""
+    try:
+        trends = {}
+        db = pymysql.connect(
+            SETTINGS["db_host"], 
+            SETTINGS["db_user"],
+            SETTINGS["db_password"],
+            SETTINGS["db_name"]
+        )
+        cursor = db.cursor()
+        query = """
+            SELECT 
+                *
+            FROM 
+                TwitterDigest
+            WHERE
+               as_of >= '{}' and
+               as_of <= '{}' and
+               woeid = {}
+        """.format(
+            start,
+            end,
+            SETTINGS["woeid"]
+        )
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        digest_ids = []
+        for row in rows:
+            digest_ids.append(row[0])
+        if len(digest_ids) < 1:
+            return trends
+        
+        trend_ids = []
+        query = """
+            SELECT 
+                *
+            FROM 
+                TimeTrendMapping
+            WHERE
+               digest_id in ({})
+        """.format(
+            ",".join([str(d) for d in digest_ids])
+        )
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        for row in rows:
+            trend_ids.append(row[2])
+        if len(trend_ids) < 1:
+            return trends
+        
+        query = """
+            SELECT 
+                *
+            FROM 
+                Trends
+            WHERE
+               id in ({})
+        """.format(
+            ",".join([str(t) for t in trend_ids])
+        )
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        for row in rows:
+            trend = row[1].lower()
+            if trend in trends:
+                if trends[trend] is None:
+                    trends[trend] = row[2]
+                elif row[2] is not None and trends[trend] < row[2]:
+                    trends[trend] = row[2]
+            else:
+                trends[trend] = row[2]
+        return trends
+    except Exception as e:
         raise(e)

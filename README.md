@@ -17,6 +17,7 @@ Understand daily trending topics for Canada from twitter data
     - requests
     - base64
     - json
+    - pytz
 - MySQL Server
 - MySQL OBDC connector
 - Power BI for visualizations
@@ -45,6 +46,24 @@ It returns the top 50 trending topics for a specific WOEID, if trending informat
 
 ![DB Design](./snapshot/DbDesign.png)
 
+# Store and search the trending data
+
+## Enter correct configurations in the settings.json file.
+
+### To extract data from twitter and store in db run:
+ - python main.py store
+
+### To search data from db run:
+- python main.py search hourly 30 (This will give hourly trends for last 30 hours)
+
+or
+
+- python main.py search daily 7 (This will give daily trends for last 7 days)
+
+or
+
+- python main.py search date 2019-07-07 (This will give hourly trends for a given day in YYYY-MM-DD format)
+
 # Setting up the cron jobs
 
 ## For Windows
@@ -67,7 +86,7 @@ We can use crontab for scheduling the job to download the twitter trends hourly 
 - Install Power Bi Desktop
 - Install Mysql ODBC connector
 - Enter the credentails to connect to data through get command in Power BI. 
-- Create the desired visulization.
+- Create the desired visualization.
 - Snapshot of dashboard is saved in 'snapshot' directory.
 
 

@@ -4,9 +4,9 @@
     "base_url": "https://api.twitter.com/",
     
     "db_host": "localhost",
-    "db_user": "sukhjit",
-    "db_password": "dhoot007",
-    "db_name": "twitter",
+    "db_user": "root",
+    "db_password": "a",
+    "db_name": "LocationTrends",
     
     "woeid": "23424775"
 }
