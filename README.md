@@ -42,6 +42,9 @@ It returns the top 50 trending topics for a specific WOEID, if trending informat
 - query
 - tweet_volume value returns the volume for each trend. This is the volume of tweets per trend for the last 24 hours.
 
+# ETL Pipeline
+![ETL pipeline](./snapshot/TwitterETL.png)
+
 # DB Design 
 
 ![DB Design](./snapshot/DbDesign.png)
