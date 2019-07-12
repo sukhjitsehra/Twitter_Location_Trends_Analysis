@@ -1,12 +1,12 @@
 {
-    "client_key": "EkeEAVqPOfxoYrDw1VP39exbC",
-    "client_secret": "5wFl7tdPF8f0QK184gr3KH1l05zUDPNQa3d98g3tHvwLAgk1WU",
+    "client_key": "",
+    "client_secret": "",
     "base_url": "https://api.twitter.com/",
     
-    "db_host": "localhost",
-    "db_user": "root",
-    "db_password": "a",
-    "db_name": "LocationTrends",
+    "db_host": "",
+    "db_user": "",
+    "db_password": "",
+    "db_name": "",
     
     "woeid": "23424775"
 }
